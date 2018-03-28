@@ -1,0 +1,9 @@
+dd.xcodeproj/
+__pycache__
+.cache
+.DS_Store
+*.pyc
+docs/_build/
+docs/_templates/
+docs/_static/
+dd.egg-info/
