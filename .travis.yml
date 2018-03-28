@@ -15,6 +15,7 @@ packages:
 # are quicker and avoid lapack issues
 install:
 - pip install --only-binary=numpy numpy
+- pip install astropy
 - pip install .
 
 # run pytest tests, build multinest first
