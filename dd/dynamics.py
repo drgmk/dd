@@ -244,6 +244,99 @@ def orbit_rv(nu, q_rstar, t_cen, t, e=1.0, m_star=1.7, r_star=1.5, testing=False
         return in_transit, rv
 
 
+def sky_orbit(a, e, i, peri, node_north, epoch, primary=False,
+                    anomaly=None, t=None, period=None):
+    '''Return an orbit on the sky.
+    
+    x, y are W, N, and z coordinate is away from us.
+
+    Parameters
+    ----------
+    a : float
+        Semi-major axis.
+    e : float
+        Eccentricity.
+    i : float
+        Inclination.
+    peri : float
+        Argument of pericenter, in degrees.
+    node_north : float
+        Longitude of ascending node, East of North, in degrees.
+    epoch : ndarray
+        List of times to return positions.
+    primary : bool, optional
+        Return primary position relative to secondary, not vice versa.
+    anomaly : float, optional
+        True anomaly, must be given if T and period are not.
+    t : float
+        Time of pericenter passage in years, must be given if anomaly is not.
+    period : float
+        Orbital period in years, must be given if anomaly is not.
+    '''
+
+    if anomaly is not None:
+        f = anomaly
+    else:
+        dyr = (epoch - t) % period      # time since last pericenter passage
+        m = dyr / period * np.pi*2      # mean anomaly (radians)
+        f = np.rad2deg( convmf(m, e) )  # true anomaly (degrees)
+
+    if primary:
+        peri += 180
+
+    # convert to cartesian (adding 90deg to Omega, which is E of N)
+    x, y, z = el2xv(a, e, i, peri, node_north+90, f, degrees=True)
+#    pa = ( np.rad2deg( np.arctan2(y, x) ) - 90 ) % 360
+#    r = np.abs([x + 1j * y])
+
+    return [x, y, -z]
+
+
+def binary_ephemeris(a, e, i, peri, node_north, epoch, q,
+                     primary=False, anomaly=None, t=None, period=None):
+    '''Return binary ephemerides.
+    
+    Values are simply passed to orbit_ephemeris and scaled in size.
+    
+    Parameters
+    ----------
+    a : float
+        Semi-major axis.
+    e : float
+        Eccentricity.
+    i : float
+        Inclination.
+    peri : float
+        Argument of pericenter, in degrees.
+    node_north : float
+        Longitude of ascending node, East of North, in degrees.
+    epoch : ndarray
+        List of times to return positions.
+    q : float
+         Mass ratio m2/m1 of binary.
+    primary : bool, optional
+        Return primary position, instead of secondary.
+    anomaly : float, optional
+        True anomaly, must be given if T and period are not.
+    t : float
+        Time of pericenter passage in years, must be given if anomaly is not.
+    period : float
+        Orbital period in years, must be given if anomaly is not.
+    '''
+
+    b = sky_orbit(*[a,e,i,peri,node_north,epoch],
+                  anomaly=anomaly, t=t, period=period)
+    a = sky_orbit(*[a,e,i,peri,node_north,epoch],
+                  anomaly=anomaly, t=t, period=period, primary=True)
+    bary_b = 1 / (1+q)
+    bary_a = q / (1+q)
+    for i in [0,1,2]:
+        a[i] *= bary_a
+        b[i] *= bary_b
+
+    return a, b
+
+
 def convfm(f_in, ecc):
     '''Convert true to mean anomaly.
     
@@ -266,6 +359,8 @@ def convmf(m_in, e_in):
     """Convert array of mean to true anomaly (for single e).
         
     From Vallado
+    
+    .. todo: tidy and include other orbit cases
     """
     
     m = np.array(m_in) % (2. * np.pi)
