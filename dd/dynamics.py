@@ -398,3 +398,9 @@ def convmf(m_in, e_in):
         print('WARNING: convmf did not converge')
     
     return nu
+
+
+def circumbinary_a_crit(e,m1,m2):
+    '''Holman & Wiegert 1999.'''
+    mu = np.min([m1,m2])/(m1+m2)
+    return 1.6 + 5.1*e - 2.22*e**2 + 4.12*mu - 4.27*e*mu - 5.09*mu**2 + 4.61*e**2 * mu**2
