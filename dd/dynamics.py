@@ -248,7 +248,7 @@ def sky_orbit(a, e, i, peri, node_north, epoch, primary=False,
                     anomaly=None, t=None, period=None):
     '''Return an orbit on the sky.
     
-    x, y are W, N, and z coordinate is away from us.
+    x, y are W, N, and z coordinate is toward us.
 
     Parameters
     ----------
@@ -282,14 +282,14 @@ def sky_orbit(a, e, i, peri, node_north, epoch, primary=False,
         f = np.rad2deg( convmf(m, e) )  # true anomaly (degrees)
 
     if primary:
-        peri += 180
+        peri = peri + 180
 
     # convert to cartesian (adding 90deg to Omega, which is E of N)
     x, y, z = el2xv(a, e, i, peri, node_north+90, f, degrees=True)
 #    pa = ( np.rad2deg( np.arctan2(y, x) ) - 90 ) % 360
 #    r = np.abs([x + 1j * y])
 
-    return [x, y, -z]
+    return [x, y, z]
 
 
 def binary_ephemeris(a, e, i, peri, node_north, epoch, q,
