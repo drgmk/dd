@@ -18,11 +18,19 @@ def bnu_wav_micron(wav_um,temp):
     fact2 = k2/(wav_um*temp)
     if isinstance(wav_um,np.ndarray):
         ofl = fact2 < 709
-        bnu = np.zeros(len(wav_um)) + cfg.tiny
+        bnu = np.zeros(len(fact2)) + cfg.tiny
         if np.any(ofl) == False:
             return bnu
         else:
             bnu[ofl] = fact1[ofl]/(np.exp(fact2[ofl])-1.0)
+            return bnu
+    elif isinstance(temp,np.ndarray):
+        ofl = fact2 < 709
+        bnu = np.zeros(len(fact2)) + cfg.tiny
+        if np.any(ofl) == False:
+            return bnu
+        else:
+            bnu[ofl] = fact1/(np.exp(fact2[ofl])-1.0)
             return bnu
     else:
         if fact2 > 709:
