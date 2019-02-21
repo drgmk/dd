@@ -1,3 +1,5 @@
+from functools import lru_cache
+import scipy.interpolate
 import numpy as np
 from astropy import constants as const
 
@@ -398,6 +400,41 @@ def convmf(m_in, e_in):
         print('WARNING: convmf did not converge')
     
     return nu
+
+
+@lru_cache(maxsize=2)
+def convmf_lookup(n=200):
+    '''Return interpolation object for convmf.'''
+    Ms = np.linspace(-np.pi, np.pi, n)
+    es = np.linspace(0, 1, n)
+    f = np.zeros((n,n))
+    for i,m in enumerate(Ms):
+        for j,e in enumerate(es):
+            tmp = convmf([m],e)[0]
+            # some fudges to avoid -pi->pi etc. steps in grid
+            if tmp > np.pi:
+                tmp -= 2*np.pi
+            if i == 0 and tmp == np.pi:
+                tmp -= 2*np.pi
+            f[i,j] = tmp
+            
+    return scipy.interpolate.RectBivariateSpline(Ms, es, f)
+
+
+def convmf_fast(m_in, e_in, n=200):
+    '''Convert mean to true anomaly with a lookup table.
+
+    Parameters
+    ----------
+    m_in : float or ndarray
+        Mean anomaly.
+    e_in : float or ndarray
+        Eccentricity.
+    '''
+    m = m_in % (2*np.pi)
+    m[m>=np.pi] -= 2*np.pi
+    convmf_interp = convmf_lookup(n=n)
+    return convmf_interp.ev(m, e_in)
 
 
 def circumbinary_a_crit(e,m1,m2):
