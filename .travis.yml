@@ -14,7 +14,7 @@ packages:
 # command to install dependencies, numpy/scipy binaries
 # are quicker and avoid lapack issues
 install:
-- pip install --only-binary=numpy numpy
+- pip install --only-binary=numpy,scipy numpy scipy
 - pip install astropy
 - pip install .
 

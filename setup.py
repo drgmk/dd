@@ -10,6 +10,6 @@ setup(
     license='MIT',
     packages=['dd'],
     classifiers=['Programming Language :: Python :: 3'],
-    install_requires = ['numpy'],
+    install_requires = ['numpy','scipy'],
     zip_safe=False
     )
