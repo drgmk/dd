@@ -10,6 +10,6 @@ setup(
     license='MIT',
     packages=['dd'],
     classifiers=['Programming Language :: Python :: 3'],
-    install_requires = ['numpy','scipy'],
+    install_requires = ['astropy','astroquery','numpy','scipy'],
     zip_safe=False
     )

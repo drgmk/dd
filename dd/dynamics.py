@@ -246,7 +246,7 @@ def orbit_rv(nu, q_rstar, t_cen, t, e=1.0, m_star=1.7, r_star=1.5, testing=False
         return in_transit, rv
 
 
-def sky_orbit(a, e, i, peri, node_north, epoch, primary=False,
+def sky_orbit(a, e, i, peri, node_north, epoch=None, primary=False,
                     anomaly=None, t=None, period=None):
     '''Return an orbit on the sky.
     
@@ -269,7 +269,7 @@ def sky_orbit(a, e, i, peri, node_north, epoch, primary=False,
     primary : bool, optional
         Return primary position relative to secondary, not vice versa.
     anomaly : float, optional
-        True anomaly, must be given if T and period are not.
+        True anomaly, must be given if epoch, T and period are not.
     t : float
         Time of pericenter passage in years, must be given if anomaly is not.
     period : float
